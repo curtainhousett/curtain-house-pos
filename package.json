@@ -1,0 +1,13 @@
+{
+  "name": "curtain-house-pos",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Curtain House Back Office, Web-POS, and Online Catalog.",
+  "scripts": {
+    "check": "node --check app.js && node -e \"import('./netlify/functions/store-sync.mjs').then(()=>import('./netlify/functions/employees-sync.mjs'))\""
+  },
+  "dependencies": {
+    "@netlify/blobs": "^10.7.9"
+  }
+}

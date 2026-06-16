@@ -1,0 +1,1102 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+    <meta name="theme-color" content="#1976d2" />
+    <meta
+      name="description"
+      content="Curtain House Back Office for inventory, employees, customers, reporting, and settings."
+    />
+    <title>Curtain House Back Office</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css?v=21" />
+  </head>
+  <body>
+    <section class="login-screen" id="loginScreen">
+      <div class="login-card">
+        <div class="login-brand">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div><strong>Curtain House</strong><small>Back Office</small></div>
+        </div>
+        <div class="login-heading"><span id="loginEyebrow">Welcome back</span><h1 id="loginTitle">Sign in to continue</h1><p id="loginDescription">Use your assigned account to access Curtain House.</p></div>
+        <form id="loginForm" class="login-form">
+          <label class="form-field"><span>Username</span><input id="loginUsername" required autocomplete="username" placeholder="Username" /></label>
+          <label class="form-field"><span>Password</span><input id="loginPassword" required type="password" autocomplete="current-password" placeholder="Password" /></label>
+          <p class="login-error hidden" id="loginError">Incorrect username or password.</p>
+          <button class="primary-btn login-submit" type="submit">Login</button>
+        </form>
+        <div class="demo-accounts">
+          <strong>Login accounts</strong>
+          <span><b>POS:</b> pos / pos123</span>
+          <span>Employee PINs are created in Back Office.</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="pin-screen hidden" id="pinScreen">
+      <button class="pin-timer" type="button" aria-label="Shift timer">◴</button>
+      <div class="pin-card">
+        <div class="login-brand pin-brand">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div><strong>Curtain House</strong><small>Point of Sale</small></div>
+        </div>
+        <div class="pin-heading"><h1>Enter PIN</h1></div>
+        <div class="pin-dots" id="pinDots"><span></span><span></span><span></span><span></span></div>
+        <p class="pin-error hidden" id="pinError">Incorrect or inactive employee PIN.</p>
+        <div class="pin-keypad" id="pinKeypad">
+          <button data-pin-digit="1">1</button><button data-pin-digit="2">2</button><button data-pin-digit="3">3</button>
+          <button data-pin-digit="4">4</button><button data-pin-digit="5">5</button><button data-pin-digit="6">6</button>
+          <button data-pin-digit="7">7</button><button data-pin-digit="8">8</button><button data-pin-digit="9">9</button>
+          <button class="pin-blank" disabled aria-hidden="true"></button><button data-pin-digit="0">0</button><button data-pin-action="clear">Clear</button>
+        </div>
+        <button class="text-btn pin-password-login" id="usePasswordLoginBtn">Use username and password</button>
+      </div>
+    </section>
+
+    <section class="public-catalog hidden" id="publicCatalog">
+      <header class="public-catalog-hero">
+        <div class="public-catalog-brand">
+          <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div>
+            <strong id="publicCatalogName">Curtain House</strong>
+            <small id="publicCatalogAddress">Trinidad & Tobago</small>
+          </div>
+        </div>
+        <div class="public-catalog-contact">
+          <a id="publicCatalogPhone" href="tel:8685550100">Call store</a>
+          <a id="publicCatalogEmail" href="mailto:sales@curtainhousett.com">Email</a>
+          <a id="publicCatalogWhatsApp" href="#" target="_blank" rel="noopener">WhatsApp order</a>
+        </div>
+      </header>
+      <main class="public-catalog-main">
+        <section class="public-catalog-banner" id="publicCatalogBanner"></section>
+        <div class="public-catalog-toolbar">
+          <div>
+            <span class="eyebrow">Online catalog</span>
+            <h1 id="publicCatalogTitle">Shop Curtain House</h1>
+          </div>
+          <label class="public-catalog-search"><span>⌕</span><input id="publicCatalogSearch" type="search" placeholder="Search products..." /></label>
+        </div>
+        <div class="public-category-scroll" id="publicCatalogCategories"></div>
+        <div class="public-product-grid" id="publicCatalogProducts"></div>
+        <div class="public-catalog-order-card">
+          <h2>How to order</h2>
+          <p id="publicCatalogAbout"></p>
+          <p id="publicCatalogInstructions">Send your selected items by WhatsApp. We will contact you shortly to confirm details, pickup, delivery, and payment.</p>
+          <div class="public-catalog-socials" id="publicCatalogSocials"></div>
+          <div class="public-order-panel" id="publicOrderPanel">
+            <div class="public-order-head">
+              <strong>Your order</strong>
+              <span id="publicOrderCount">0 items</span>
+            </div>
+            <div class="public-order-items" id="publicOrderItems"></div>
+            <div class="public-order-total"><span>Total</span><strong id="publicOrderTotal">TT$0.00</strong></div>
+            <form class="public-order-form" id="publicOrderForm">
+              <input id="publicCustomerName" placeholder="Customer name" required />
+              <input id="publicCustomerPhone" placeholder="Phone / WhatsApp" required />
+              <input id="publicCustomerAddress" placeholder="Delivery or pickup address" />
+              <textarea id="publicCustomerNotes" rows="2" placeholder="Notes for your order"></textarea>
+              <button type="submit">Send order</button>
+            </form>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <div class="app-shell auth-hidden" id="appShell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </div>
+          <div>
+            <strong>Curtain House</strong>
+            <small id="workspaceLabel">Sales POS</small>
+          </div>
+        </div>
+
+        <nav class="main-nav" aria-label="Main navigation">
+          <button class="nav-item active" data-view="sell">
+            <span class="nav-icon">▣</span><span>Sales</span>
+          </button>
+          <button class="nav-item" data-view="receipts">
+            <span class="nav-icon">▤</span><span>Receipts</span>
+          </button>
+          <button class="nav-item" data-view="shifts">
+            <span class="nav-icon">◷</span><span>Shift</span>
+          </button>
+          <button class="nav-item backoffice-nav-only" data-view="dashboard" data-nav-group="reports">
+            <span class="nav-icon reports-icon">▥</span><span>Reports</span>
+          </button>
+          <div class="nav-submenu report-nav-submenu backoffice-nav-only" data-nav-group-panel="reports" aria-label="Reports menu">
+            <button class="nav-subitem" data-report-nav="dashboard">Sales summary</button>
+            <button class="nav-subitem" data-report-nav="reports">Sales by item</button>
+            <button class="nav-subitem" data-report-nav="reports">Sales by category</button>
+            <button class="nav-subitem" data-report-nav="reports">Sales by employee</button>
+            <button class="nav-subitem" data-report-nav="reports">Sales by payment type</button>
+            <button class="nav-subitem" data-report-nav="reports">Receipts</button>
+            <button class="nav-subitem" data-report-nav="reports">Sales by modifier</button>
+            <button class="nav-subitem" data-report-nav="reports">Discounts</button>
+            <button class="nav-subitem" data-report-nav="reports">Taxes</button>
+            <button class="nav-subitem" data-report-nav="reports">Shifts</button>
+          </div>
+          <button class="nav-item" data-view="products" data-management>
+            <span class="nav-icon">▦</span><span>Items</span><span class="lock-icon">🔒</span>
+          </button>
+          <button class="nav-item web-pos-nav-only" data-view="onlineCatalog" data-management>
+            <span class="nav-icon">🛒</span><span>Online Catalog</span><span class="lock-icon">🔒</span>
+          </button>
+          <button class="nav-item web-pos-nav-only" data-view="orders" data-management>
+            <span class="nav-icon">◴</span><span>Orders</span><span class="lock-icon">🔒</span>
+          </button>
+          <button class="nav-item backoffice-nav-only" data-module="Purchase Orders">
+            <span class="nav-icon inventory-icon">🛒</span><span>Inventory management</span>
+          </button>
+          <button class="nav-item backoffice-nav-only" data-view="employees">
+            <span class="nav-icon employees-icon">▣</span><span>Employees</span>
+          </button>
+          <button class="nav-item backoffice-nav-only" data-view="customers">
+            <span class="nav-icon customers-icon">👥</span><span>Customers</span>
+          </button>
+          <button class="nav-item backoffice-nav-only" data-module="Integrations">
+            <span class="nav-icon integrations-icon">✚</span><span>Integrations</span>
+          </button>
+          <button class="nav-item" data-view="settings" data-admin-only>
+            <span class="nav-icon">⚙</span><span>Settings</span><span class="lock-icon">🔒</span>
+          </button>
+          <button class="nav-item" id="backOfficeNavBtn" data-view="dashboard" data-management>
+            <span class="nav-icon">⌂</span><span>Back Office</span><span class="lock-icon">🔒</span>
+          </button>
+          <button class="nav-item pos-app-only" id="installHelpBtn">
+            <span class="nav-icon">▦</span><span>Apps</span>
+          </button>
+          <button class="nav-item pos-app-only" id="supportBtn">
+            <span class="nav-icon">ⓘ</span><span>Support</span>
+          </button>
+          <button class="nav-item backoffice-nav-only" data-module="Help">
+            <span class="nav-icon help-icon">?</span><span>Help</span>
+          </button>
+          <button class="nav-item" id="logoutBtn">
+            <span class="nav-icon">↪</span><span>Logout</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="status-card">
+            <span class="status-dot"></span>
+            <div><strong>Store online</strong><small>Changes saved locally</small></div>
+          </div>
+          <button class="user-card" id="userMenu">
+            <span class="avatar" id="sessionAvatar">AM</span>
+            <span><strong id="sessionName">Alex Morgan</strong><small id="sessionRole">Store Manager</small></span>
+            <span class="more">•••</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button class="icon-btn menu-btn" id="menuBtn" aria-label="Open menu">☰</button>
+          <div class="page-heading">
+            <p id="dateLabel"></p>
+            <h1 id="pageTitle">Sales</h1>
+          </div>
+          <div class="top-actions">
+            <label class="global-search">
+              <span>⌕</span>
+              <input id="globalSearch" type="search" placeholder="Search products or SKU" />
+              <kbd>⌘ K</kbd>
+            </label>
+            <button class="icon-btn pos-app-only" id="scanBarcodeBtn" title="Scan barcode" aria-label="Scan barcode">▥</button>
+            <button class="icon-btn pos-app-only" id="mobileAddCustomerBtn" title="Add customer" aria-label="Add customer">♟</button>
+            <button class="icon-btn pos-app-only" id="mobileMoreBtn" title="Ticket actions" aria-label="Ticket actions">⋮</button>
+            <button class="icon-btn pos-app-only" id="mobileProductBarcodeBtn" title="Find item by barcode" aria-label="Find item by barcode">▥</button>
+            <button class="icon-btn pos-app-only" id="mobileProductSearchBtn" title="Search items" aria-label="Search items">⌕</button>
+            <button class="icon-btn" id="resetBtn" title="Reset demo data" aria-label="Reset demo data">↻</button>
+          </div>
+        </header>
+
+        <section class="view active" id="sellView">
+          <div class="sell-layout">
+            <div class="catalog-panel">
+              <div class="sales-strip">
+                <div><span>Today's sales</span><strong id="todaySales">$0.00</strong></div>
+                <div><span>Transactions</span><strong id="todayTransactions">0</strong></div>
+                <div><span>Low stock</span><strong id="lowStockCount">0</strong></div>
+              </div>
+
+              <div class="section-toolbar">
+                <button class="mobile-catalog-select pos-app-only" id="mobileCatalogSelectBtn" type="button">
+                  <span id="mobileCatalogLabel">All items</span>
+                  <span class="mobile-catalog-arrow">⌄</span>
+                </button>
+                <div class="mobile-catalog-actions pos-app-only">
+                  <button id="mobileBarcodeBtn" type="button" aria-label="Scan barcode">▥</button>
+                  <button id="mobileSearchToggleBtn" type="button" aria-label="Search items">⌕</button>
+                </div>
+                <div>
+                  <span class="eyebrow">Product catalog</span>
+                  <h2>Choose an item</h2>
+                </div>
+                <div class="toolbar-actions">
+                  <div class="view-switch" aria-label="Catalog view">
+                    <button class="active" data-catalog-view="icon" title="Icon view">▦</button>
+                    <button data-catalog-view="list" title="List view">☷</button>
+                    <button data-catalog-view="small" title="Small size view">▦</button>
+                  </div>
+                  <button class="secondary-btn" id="openTicketsBtn"><span>▤</span> Open tickets <b id="ticketCount">0</b></button>
+                  <button class="secondary-btn" id="customItemBtn"><span>＋</span> Custom item</button>
+                </div>
+              </div>
+
+              <div class="mobile-search-row pos-app-only hidden" id="mobileSearchRow">
+                <span>⌕</span>
+                <input id="mobileSalesSearch" type="search" placeholder="Search" autocomplete="off" />
+                <button id="mobileSearchCloseBtn" type="button" aria-label="Close search">×</button>
+              </div>
+              <div class="mobile-catalog-menu pos-app-only hidden" id="mobileCatalogMenu"></div>
+              <div class="category-tabs" id="categoryTabs"></div>
+              <div class="product-grid" id="productGrid"></div>
+              <div class="empty-state hidden" id="catalogEmpty">
+                <div class="empty-icon">⌕</div>
+                <h3>No products found</h3>
+                <p>Try another search or category.</p>
+              </div>
+            </div>
+
+            <aside class="cart-panel">
+              <div class="cart-header">
+                <div>
+                  <span class="eyebrow">Current order</span>
+                  <h2>Sale <span id="saleNumber">#1001</span></h2>
+                </div>
+                <button class="text-btn danger" id="clearCartBtn">Clear</button>
+              </div>
+
+              <button class="customer-select" id="customerBtn">
+                <span class="customer-icon">＋</span>
+                <span><strong id="customerName">Add customer</strong><small id="customerDetail">Optional</small></span>
+                <span class="chevron">›</span>
+              </button>
+
+              <div class="cart-items" id="cartItems"></div>
+              <div class="cart-empty" id="cartEmpty">
+                <div class="bag-icon">▱</div>
+                <h3>Your cart is empty</h3>
+                <p>Select an item to begin a sale</p>
+              </div>
+
+              <div class="cart-summary">
+                <button class="save-ticket-btn" id="saveTicketBtn" disabled><span>▤</span> Save open ticket</button>
+                <div class="discount-row">
+                  <button id="discountBtn">＋ Add discount</button>
+                  <span id="discountDisplay"></span>
+                </div>
+                <div class="summary-row"><span>Subtotal</span><strong id="subtotal">$0.00</strong></div>
+                <div class="summary-row"><span id="taxLabel">VAT (12.5%)</span><strong id="tax">$0.00</strong></div>
+                <div class="summary-row total-row"><span>Total</span><strong id="total">$0.00</strong></div>
+                <button class="checkout-btn" id="checkoutBtn" disabled>
+                  <span>Charge</span><strong id="chargeTotal">$0.00</strong>
+                </button>
+              </div>
+            </aside>
+            <div class="mobile-ticket-view pos-app-only hidden" id="mobileTicketView"></div>
+            <div class="mobile-more-menu pos-app-only hidden" id="mobileMoreMenu">
+              <button type="button" data-mobile-menu-action="clear"><span>▥</span><strong>Clear ticket</strong></button>
+              <button type="button" data-mobile-menu-action="print"><span>▣</span><strong>Print bill</strong></button>
+              <button type="button" data-mobile-menu-action="edit"><span>✎</span><strong>Edit ticket</strong></button>
+              <button type="button" data-mobile-menu-action="assign"><span>♟</span><strong>Assign ticket</strong></button>
+              <button type="button" data-mobile-menu-action="split"><span>⌁</span><strong>Split ticket</strong></button>
+              <button type="button" data-mobile-menu-action="move"><span>▤</span><strong>Move ticket</strong></button>
+              <button type="button" data-mobile-menu-action="drawer"><span>▣</span><strong>Open cash drawer</strong></button>
+              <button type="button" data-mobile-menu-action="sync"><span>↻</span><strong>Sync</strong></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="onlineCatalogView">
+          <div class="online-catalog-admin">
+            <div class="online-catalog-header">
+              <div>
+                <span class="eyebrow">Online sales</span>
+                <h2>Online Catalog</h2>
+                <p>Set up the customer catalog, publish products, and share the store link.</p>
+              </div>
+              <button class="primary-btn" id="openCatalogPreviewBtn" type="button">↗ See in another tab</button>
+            </div>
+
+            <div class="catalog-link-card">
+              <span class="catalog-link-icon">⌁</span>
+              <div>
+                <strong>Catalog link</strong>
+                <small id="catalogPublicLink">https://pos.curtainhousett.com/catalog</small>
+              </div>
+              <button class="text-btn" id="copyCatalogLinkBtn" type="button">Copy link</button>
+            </div>
+
+            <div class="online-catalog-grid">
+              <div class="online-catalog-column">
+                <section class="catalog-admin-card publish-card">
+                  <div>
+                    <h3>Publish my catalog</h3>
+                    <p id="catalogPublishUrl">/catalog</p>
+                  </div>
+                  <label class="switch"><input id="catalogPublishedToggle" type="checkbox" /><span></span></label>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Main color</h3>
+                  <p>Choose the color theme that best suits your brand.</p>
+                  <div class="catalog-color-row" id="catalogColorChoices">
+                    <button type="button" data-catalog-color="#f2c94c" style="--swatch:#f2c94c"></button>
+                    <button type="button" data-catalog-color="#e86f3f" style="--swatch:#e86f3f"></button>
+                    <button type="button" data-catalog-color="#e53935" style="--swatch:#e53935"></button>
+                    <button type="button" data-catalog-color="#c65a8e" style="--swatch:#c65a8e"></button>
+                    <button type="button" data-catalog-color="#90caf9" style="--swatch:#90caf9"></button>
+                    <button type="button" data-catalog-color="#0d47a1" style="--swatch:#0d47a1"></button>
+                    <button type="button" data-catalog-color="#263238" style="--swatch:#263238"></button>
+                    <button type="button" data-catalog-color="#43a047" style="--swatch:#43a047"></button>
+                  </div>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Catalog version</h3>
+                  <p>Compare and choose the catalog version that best fits your business.</p>
+                  <div class="catalog-segmented">
+                    <button type="button" data-catalog-version="new">✓ New Catalog</button>
+                    <button type="button" data-catalog-version="classic">Classic Catalog</button>
+                  </div>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Main display mode</h3>
+                  <label class="catalog-radio-row"><input name="catalogDisplayMode" type="radio" value="list" /><span><strong>List mode</strong><small>Quicker browsing, ideal for large amounts of products.</small></span></label>
+                  <label class="catalog-radio-row"><input name="catalogDisplayMode" type="radio" value="grid" /><span><strong>Grid mode</strong><small>Ideal for viewing several products with pictures at the same time.</small></span></label>
+                  <label class="catalog-radio-row"><input name="catalogDisplayMode" type="radio" value="instaview" /><span><strong>Instaview mode</strong><small>Best to see the product, ideal for well produced photos.</small></span></label>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Store Banner</h3>
+                  <div class="catalog-banner-editor">
+                    <div class="catalog-banner-preview" id="catalogBannerPreview">No banner uploaded</div>
+                    <div>
+                      <label class="secondary-btn catalog-upload-btn" for="catalogBannerInput">Choose banner</label>
+                      <input class="hidden" id="catalogBannerInput" type="file" accept="image/*" />
+                      <button class="text-btn danger" id="deleteCatalogBannerBtn" type="button">Delete banner</button>
+                      <small>Recommended for offers like bedsheet promos or store announcements.</small>
+                    </div>
+                  </div>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Out of stock products</h3>
+                  <label class="catalog-radio-row"><input name="catalogOutOfStock" type="radio" value="hide" /><span><strong>Don't show on catalog</strong></span></label>
+                  <label class="catalog-radio-row"><input name="catalogOutOfStock" type="radio" value="unavailable" /><span><strong>Show as unavailable</strong></span></label>
+                  <label class="catalog-radio-row"><input name="catalogOutOfStock" type="radio" value="available" /><span><strong>Show as available</strong></span></label>
+                </section>
+              </div>
+
+              <div class="online-catalog-column">
+                <section class="catalog-admin-card catalog-preview-card">
+                  <div class="data-card-header">
+                    <div><span class="eyebrow">Preview</span><h3>Customer view</h3></div>
+                    <button class="secondary-btn" id="refreshCatalogPreviewBtn" type="button">Refresh</button>
+                  </div>
+                  <div class="catalog-phone-preview" id="catalogPhonePreview"></div>
+                  <button class="text-btn preview-link" id="previewCatalogInlineBtn" type="button">Preview this catalog</button>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Business Information</h3>
+                  <p>Edit what customers see on the online catalog.</p>
+                  <div class="catalog-checklist">
+                    <span>✓ Business name</span><span>✓ Logo</span><span>✓ Work phone</span><span>✓ WhatsApp</span><span>✓ Address</span><span>✓ Social networks</span><span>✓ About the store</span>
+                  </div>
+                  <form class="catalog-business-form" id="catalogBusinessForm">
+                    <div class="catalog-logo-editor">
+                      <div class="catalog-logo-preview" id="catalogLogoPreview">No logo</div>
+                      <div class="catalog-logo-actions">
+                        <label class="secondary-btn catalog-upload-btn" for="catalogLogoInput">Upload logo</label>
+                        <input class="hidden" id="catalogLogoInput" type="file" accept="image/*" />
+                        <button class="text-btn danger" id="catalogRemoveLogoBtn" type="button">Remove logo</button>
+                      </div>
+                    </div>
+                    <div class="form-grid">
+                      <label class="form-field"><span>Business name</span><input id="catalogBusinessName" required /></label>
+                      <label class="form-field"><span>Work phone</span><input id="catalogBusinessPhone" /></label>
+                      <label class="form-field"><span>WhatsApp number</span><input id="catalogBusinessWhatsapp" placeholder="8685550100" /></label>
+                      <label class="form-field"><span>Email</span><input id="catalogBusinessEmail" type="email" /></label>
+                      <label class="form-field full"><span>Address</span><textarea id="catalogBusinessAddress" rows="2"></textarea></label>
+                      <label class="form-field full"><span>About the store</span><textarea id="catalogAboutStore" maxlength="280" rows="3"></textarea><small><span id="catalogAboutCount">0</span>/280</small></label>
+                      <label class="form-field"><span>Facebook</span><input id="catalogFacebook" placeholder="facebook.com/yourpage" /></label>
+                      <label class="form-field"><span>Instagram</span><input id="catalogInstagram" placeholder="instagram.com/yourpage" /></label>
+                      <label class="form-field"><span>TikTok</span><input id="catalogTikTok" placeholder="tiktok.com/@yourstore" /></label>
+                      <label class="form-field"><span>Website</span><input id="catalogWebsite" placeholder="curtainhousett.com" /></label>
+                    </div>
+                    <button class="primary-btn" type="submit">Save business info</button>
+                  </form>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Orders</h3>
+                  <label class="catalog-toggle-row"><span><strong>Accept online orders</strong><small>Orders will appear as pending until you accept them as confirmed.</small></span><label class="switch"><input id="catalogAcceptOrdersToggle" type="checkbox" /><span></span></label></label>
+                  <label class="catalog-toggle-row"><span><strong>Receive order summary via WhatsApp</strong><small>Customers will be directed to send the order summary to WhatsApp.</small></span><label class="switch"><input id="catalogWhatsappToggle" type="checkbox" /><span></span></label></label>
+                  <label class="form-field full"><span>Post-order instructions</span><textarea id="catalogPostOrderMessage" maxlength="200"></textarea><small><span id="catalogMessageCount">0</span>/200</small></label>
+                </section>
+
+                <section class="catalog-admin-card">
+                  <h3>Other settings</h3>
+                  <button class="catalog-settings-row" type="button"><span><strong>Payment options</strong><small>Customize your business payment methods</small></span><b>↗</b></button>
+                  <button class="catalog-settings-row" type="button"><span><strong>Pickup and delivery</strong><small>Add the options your business offers</small></span><b>↗</b></button>
+                  <button class="catalog-settings-row" type="button"><span><strong>Sale Channels</strong><small>Prepare Google, Facebook, Instagram and TikTok links</small></span><b>↗</b></button>
+                  <button class="catalog-settings-row" type="button"><span><strong>Fees and order status</strong><small>Catalog fees and order status workflow</small></span><b>↗</b></button>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="ordersView">
+          <div class="page-wrap orders-page">
+            <div class="orders-header">
+              <div>
+                <span class="eyebrow">Online Catalog</span>
+                <h2><span id="onlineOrderCount">0</span> open orders</h2>
+              </div>
+              <button class="primary-btn" id="openCatalogFromOrdersBtn" type="button">Open catalog</button>
+            </div>
+            <div class="data-card orders-list-card">
+              <div class="orders-filterbar">
+                <label class="table-search"><span>⌕</span><input id="orderSearch" type="search" placeholder="Item or customer" /></label>
+                <select id="orderStatusFilter">
+                  <option>All status</option>
+                  <option>Pending</option>
+                  <option>Confirmed</option>
+                  <option>Completed</option>
+                  <option>Cancelled</option>
+                </select>
+              </div>
+              <div class="table-wrap">
+                <table class="orders-table">
+                  <thead><tr><th>Receipt</th><th>Date</th><th>Customer</th><th>Seller</th><th>Items</th><th>Price</th><th>Status</th><th>Type</th><th>Obs.</th></tr></thead>
+                  <tbody id="ordersTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="online-order-detail" id="onlineOrderDetail"></div>
+          </div>
+        </section>
+
+        <section class="view" id="dashboardView">
+          <div class="page-wrap">
+            <div class="bo-filterbar">
+              <button class="bo-filter-chip" type="button">‹</button>
+              <button class="bo-filter-chip" type="button"><span id="dashboardDateFilter">Today</span><span>›</span></button>
+              <button class="bo-filter-chip" type="button"><span>◷</span><span>All day</span><span>⌄</span></button>
+              <button class="bo-filter-chip" type="button"><span>♟</span><span>All employees</span><span>⌄</span></button>
+            </div>
+            <div class="data-card sales-summary-card">
+              <div class="sales-summary-metrics">
+                <article class="bo-summary-metric active">
+                  <span>Refunds</span>
+                  <strong id="dashboardRefunds">TT$0.00</strong>
+                  <small id="dashboardRefundsDelta">TT$0.00 (0.00%)</small>
+                </article>
+                <article class="bo-summary-metric">
+                  <span>Discounts</span>
+                  <strong id="dashboardDiscounts">TT$0.00</strong>
+                  <small id="dashboardDiscountsDelta">TT$0.00 (0.00%)</small>
+                </article>
+                <article class="bo-summary-metric">
+                  <span>Net sales</span>
+                  <strong id="dashboardSales">TT$0.00</strong>
+                  <small id="dashboardSalesDelta">TT$0.00 (0.00%)</small>
+                </article>
+                <article class="bo-summary-metric">
+                  <span>Gross profit</span>
+                  <strong id="dashboardGrossProfit">TT$0.00</strong>
+                  <small id="dashboardGrossProfitDelta">TT$0.00 (0.00%)</small>
+                </article>
+              </div>
+              <div class="bo-chart-controls">
+                <button type="button">Area <span>⌄</span></button>
+                <button type="button">Days <span>⌄</span></button>
+              </div>
+              <div class="sales-graph loyverse-graph" id="dashboardSalesGraph"></div>
+            </div>
+            <div class="dashboard-grid">
+              <div class="data-card">
+                <div class="data-card-header"><div><span class="eyebrow">Performance</span><h2>Top selling items</h2></div><button class="secondary-btn" data-report-link="Sales by item">View reports</button></div>
+                <div class="leader-list" id="topItemsList"></div>
+              </div>
+              <div class="data-card">
+                <div class="data-card-header"><div><span class="eyebrow">Action center</span><h2>Needs attention</h2></div></div>
+                <div class="attention-list" id="attentionList"></div>
+              </div>
+            </div>
+            <div class="data-card module-directory loyverse-directory">
+              <div class="data-card-header">
+                <div><span class="eyebrow">Management</span><h2>Back Office</h2></div>
+              </div>
+              <div class="loyverse-module-list">
+                <section class="loyverse-module-section">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon reports-icon">▥</span>
+                    <div><strong>Reports</strong><small>Sales, receipts, taxes and shifts</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links">
+                    <button data-report-link="Sales summary">Sales Summary</button><button data-report-link="Sales by item">Sales by Item</button><button data-report-link="Sales by category">Sales by Category</button><button data-report-link="Sales by employee">Sales by Employee</button><button data-report-link="Sales by payment type">Sales by Payment Type</button><button data-report-link="Receipts">Receipts</button><button data-report-link="Sales by modifier">Sales by Modifier</button><button data-report-link="Discounts">Discounts</button><button data-report-link="Taxes">Taxes</button><button data-report-link="Shifts">Shifts</button>
+                  </div>
+                </section>
+                <section class="loyverse-module-section">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon items-icon">▰</span>
+                    <div><strong>Items</strong><small>Item list, categories, modifiers and discounts</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links">
+                    <button data-backoffice-view="products">Item List</button><button data-module>Categories</button><button data-module>Modifiers</button><button data-module>Discounts</button>
+                  </div>
+                </section>
+                <section class="loyverse-module-section">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon inventory-icon">▱</span>
+                    <div><strong>Inventory management</strong><small>Purchasing, transfers, counts and valuation</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links">
+                    <button data-module>Purchase Orders</button><button data-module>Transfer Orders</button><button data-module>Stock Adjustments</button><button data-module>Inventory Counts</button><button data-module>Productions</button><button data-module>Suppliers</button><button data-module>Inventory History</button><button data-module>Inventory Valuation</button>
+                  </div>
+                </section>
+                <section class="loyverse-module-section">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon employees-icon">▣</span>
+                    <div><strong>Employees</strong><small>Access rights, time cards and hours worked</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links">
+                    <button data-backoffice-view="employees">Employee List</button><button data-module>Access Rights</button><button data-module>Time Cards</button><button data-module>Hours Worked</button>
+                  </div>
+                </section>
+                <section class="loyverse-module-section">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon customers-icon">●</span>
+                    <div><strong>Customers</strong><small>Customer list, loyalty and history</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links">
+                    <button data-backoffice-view="customers">Customer List</button><button data-module>Loyalty Points</button><button data-module>Customer History</button>
+                  </div>
+                </section>
+                <section class="loyverse-module-section">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon settings-icon">⚙</span>
+                    <div><strong>Settings</strong><small>Features, payments, loyalty, taxes and receipts</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links">
+                    <button data-module>Features</button><button data-module>Payment Types</button><button data-module>Loyalty</button><button data-module>Taxes</button><button data-module>Receipt</button><button data-module>Open Tickets</button><button data-module>Stores</button><button data-module>POS Devices</button>
+                  </div>
+                </section>
+                <section class="loyverse-module-section future">
+                  <div class="loyverse-module-row">
+                    <span class="loyverse-module-icon future-icon">＋</span>
+                    <div><strong>Curtain House future modules</strong><small>Orders, deposits, delivery, installation and barcode printing</small></div>
+                    <span class="loyverse-row-arrow">⌄</span>
+                  </div>
+                  <div class="module-links loyverse-links future">
+                    <button data-module>Curtain Measurement</button><button data-module>Customer Orders</button><button data-module>Deposit Tracking</button><button data-module>Balance Tracking</button><button data-module>Delivery Tracking</button><button data-module>Installation Scheduling</button><button data-module>Barcode Printing</button>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="workflowView">
+          <div class="page-wrap">
+            <div class="workflow-hero">
+              <button class="secondary-btn" id="workflowBackBtn">‹ Back Office</button>
+              <div><span class="eyebrow">Back Office workflow</span><h2 id="workflowTitle">Customer Orders</h2><p id="workflowDescription"></p></div>
+              <button class="primary-btn" id="addWorkflowRecordBtn">＋ Add record</button>
+            </div>
+            <div class="overview-cards">
+              <article class="metric-card forest"><span class="metric-icon">▤</span><div><span>Total records</span><strong id="workflowTotal">0</strong><small>Saved in this module</small></div></article>
+              <article class="metric-card"><span class="metric-icon mint">✓</span><div><span>Completed / active</span><strong id="workflowComplete">0</strong><small>Ready or completed records</small></div></article>
+              <article class="metric-card"><span class="metric-icon amber">◷</span><div><span>Needs action</span><strong id="workflowPending">0</strong><small>Open workflow records</small></div></article>
+            </div>
+            <div class="data-card">
+              <div class="data-card-header"><div><span class="eyebrow">Workflow records</span><h2 id="workflowListTitle">Customer Orders</h2></div><button class="secondary-btn" id="exportWorkflowBtn">Export CSV</button></div>
+              <div class="workflow-filterbar">
+                <div class="table-search"><span>⌕</span><input id="workflowSearch" type="search" placeholder="Search records..." /></div>
+                <select id="workflowStatusFilter"><option value="">All statuses</option></select>
+              </div>
+              <div class="workflow-list" id="workflowList"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="receiptsView">
+          <div class="page-wrap split-page">
+            <div class="data-card receipt-list-card">
+              <div class="data-card-header"><div><span class="eyebrow">Sales history</span><h2>Receipts</h2></div></div>
+              <div class="table-search"><span>⌕</span><input id="receiptSearch" type="search" placeholder="Search receipt, customer, or payment..." /></div>
+              <div class="receipt-browser-list" id="receiptBrowserList"></div>
+            </div>
+            <div class="data-card receipt-detail-card" id="receiptDetailCard">
+              <div class="empty-list receipt-placeholder">Select a receipt to view its details.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="productsView">
+          <div class="mobile-inventory-screen pos-app-only">
+            <div class="mobile-product-search-row hidden" id="mobileProductSearchRow">
+              <span>⌕</span>
+              <input id="mobileProductSearchInput" type="search" placeholder="Search" autocomplete="off" />
+              <button id="mobileProductSearchCloseBtn" type="button" aria-label="Close item search">×</button>
+            </div>
+            <div class="mobile-product-category-menu hidden" id="mobileProductCategoryMenu"></div>
+            <div class="mobile-inventory-list" id="mobileProductList"></div>
+            <button class="mobile-add-item-fab" id="mobileAddItemBtn" type="button" aria-label="Add item">＋</button>
+          </div>
+          <div class="page-wrap">
+            <div class="overview-cards">
+              <article class="metric-card forest">
+                <span class="metric-icon">▦</span>
+                <div><span>Total products</span><strong id="productCount">0</strong><small>Across all categories</small></div>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon amber">!</span>
+                <div><span>Low stock</span><strong id="productLowStock">0</strong><small>Needs attention</small></div>
+              </article>
+              <article class="metric-card">
+                <span class="metric-icon lilac">$</span>
+                <div><span>Inventory value</span><strong id="inventoryValue">$0</strong><small>At retail price</small></div>
+              </article>
+            </div>
+            <div class="data-card">
+              <div class="data-card-header">
+                <div><span class="eyebrow">Inventory</span><h2>Products</h2></div>
+                <div class="toolbar-actions"><button class="secondary-btn" id="importProductsBtn">Import CSV</button><button class="secondary-btn" id="exportProductsBtn">Export CSV</button><button class="primary-btn" id="addProductBtn">＋ Add product</button><input class="hidden" id="productCsvInput" type="file" accept=".csv,text/csv" /></div>
+              </div>
+              <div class="table-search">
+                <span>⌕</span><input id="productSearch" type="search" placeholder="Search inventory..." />
+              </div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th>Cost</th><th>Selling price</th><th>Tax</th><th>Stock</th><th>Catalog</th><th></th></tr></thead>
+                  <tbody id="productTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="customersView">
+          <div class="page-wrap">
+            <div class="overview-cards">
+              <article class="metric-card forest"><span class="metric-icon">♙</span><div><span>Total customers</span><strong id="customerCount">0</strong><small>Saved customer profiles</small></div></article>
+              <article class="metric-card"><span class="metric-icon amber">★</span><div><span>Loyalty points</span><strong id="loyaltyPointsTotal">0</strong><small>Across all customers</small></div></article>
+              <article class="metric-card"><span class="metric-icon lilac">$</span><div><span>Customer spend</span><strong id="customerSpendTotal">$0</strong><small>Lifetime purchases</small></div></article>
+            </div>
+            <div class="data-card">
+              <div class="data-card-header">
+                <div><span class="eyebrow">CRM & loyalty</span><h2>Customers</h2></div>
+                <button class="primary-btn" id="addCustomerBtn">＋ Add customer</button>
+              </div>
+              <div class="table-search"><span>⌕</span><input id="customerSearch" type="search" placeholder="Search customers..." /></div>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Customer</th><th>Contact</th><th>Visits</th><th>Points</th><th>Total spent</th><th>Last visit</th></tr></thead>
+                  <tbody id="customerTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="reportsView">
+          <div class="page-wrap">
+            <div class="report-banner">
+              <div>
+                <span class="eyebrow light" id="reportEyebrow">Report</span>
+                <h2 id="reportDetailTitle">Sales by item</h2>
+                <p id="reportDetailSubtitle">Detailed sales report from synced POS activity.</p>
+              </div>
+              <div class="banner-total"><span id="reportDetailTotalLabel">Total sales</span><strong id="allTimeRevenue">$0.00</strong></div>
+            </div>
+            <div class="overview-cards report-metrics">
+              <article class="metric-card"><span class="metric-icon mint" id="reportMetricOneIcon">↗</span><div><span id="reportMetricOneLabel">Today's revenue</span><strong id="reportTodayRevenue">$0</strong><small id="reportTodayCount">0 transactions</small></div></article>
+              <article class="metric-card"><span class="metric-icon lilac" id="reportMetricTwoIcon">◈</span><div><span id="reportMetricTwoLabel">Average sale</span><strong id="averageSale">$0</strong><small id="reportMetricTwoNote">All completed sales</small></div></article>
+              <article class="metric-card"><span class="metric-icon amber" id="reportMetricThreeIcon">☆</span><div><span id="reportMetricThreeLabel">Top category</span><strong id="topCategory">—</strong><small id="reportMetricThreeNote">By units sold</small></div></article>
+            </div>
+            <div class="data-card report-detail-card">
+              <div class="data-card-header">
+                <div><span class="eyebrow" id="reportTableEyebrow">Details</span><h2 id="reportTableTitle">Report details</h2></div>
+                <button class="secondary-btn" id="reportPrintBtn" type="button">Print</button>
+              </div>
+              <div class="table-wrap">
+                <table class="report-detail-table">
+                  <thead id="reportTableHead"></thead>
+                  <tbody id="reportTableBody"></tbody>
+                </table>
+              </div>
+            </div>
+            <div class="report-grid">
+              <div class="data-card">
+                <div class="data-card-header"><div><span class="eyebrow">History</span><h2>Recent sales</h2></div></div>
+                <div class="transaction-list" id="transactionList"></div>
+              </div>
+              <div class="data-card">
+                <div class="data-card-header"><div><span class="eyebrow">Categories</span><h2>Sales mix</h2></div></div>
+                <div class="category-report" id="categoryReport"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="shiftsView">
+          <div class="page-wrap">
+            <div class="shift-hero" id="shiftHero"></div>
+            <div class="overview-cards">
+              <article class="metric-card"><span class="metric-icon">$</span><div><span>Starting cash</span><strong id="shiftStartingCash">$0</strong><small>Cash entered at shift open</small></div></article>
+              <article class="metric-card"><span class="metric-icon mint">↗</span><div><span>Cash sales</span><strong id="shiftCashSales">$0</strong><small>During current shift</small></div></article>
+              <article class="metric-card"><span class="metric-icon lilac">▰</span><div><span>Card sales</span><strong id="shiftCardSales">$0</strong><small>During current shift</small></div></article>
+              <article class="metric-card"><span class="metric-icon">↗</span><div><span>Other payments</span><strong id="shiftOtherSales">$0</strong><small>Transfer and other</small></div></article>
+              <article class="metric-card"><span class="metric-icon mint">+</span><div><span>Pay In</span><strong id="shiftPayIn">$0</strong><small>Cash added</small></div></article>
+              <article class="metric-card"><span class="metric-icon amber">−</span><div><span>Pay Out</span><strong id="shiftPayOut">$0</strong><small>Cash removed</small></div></article>
+              <article class="metric-card"><span class="metric-icon amber">◈</span><div><span>Transactions</span><strong id="shiftTransactionCount">0</strong><small>During current shift</small></div></article>
+            </div>
+            <div class="overview-cards manager-shift-totals" id="managerShiftTotals">
+              <article class="metric-card forest"><span class="metric-icon">$</span><div><span>Expected cash</span><strong id="expectedCash">$0</strong><small>Starting cash + cash sales + movements</small></div></article>
+              <article class="metric-card"><span class="metric-icon">✓</span><div><span>Counted cash</span><strong>Enter when closing</strong><small>Manager/Admin only</small></div></article>
+              <article class="metric-card"><span class="metric-icon amber">±</span><div><span>Difference</span><strong>Shown at close</strong><small>Manager/Admin only</small></div></article>
+            </div>
+            <div class="report-grid">
+              <div class="data-card">
+                <div class="data-card-header"><div><span class="eyebrow">Cash drawer</span><h2>Cash movements</h2></div><button class="secondary-btn" id="cashMovementBtn">＋ Cash in/out</button></div>
+                <div class="transaction-list" id="cashMovementList"></div>
+              </div>
+              <div class="data-card">
+                <div class="data-card-header"><div><span class="eyebrow">Shift history</span><h2>Recent shifts</h2></div></div>
+                <div class="transaction-list" id="shiftHistoryList"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="employeesView">
+          <div class="page-wrap">
+            <div class="overview-cards">
+              <article class="metric-card forest"><span class="metric-icon">♟</span><div><span>Team members</span><strong id="employeeCount">0</strong><small>Active employees</small></div></article>
+              <article class="metric-card"><span class="metric-icon mint">◷</span><div><span>Clocked in</span><strong id="clockedInCount">0</strong><small>Working now</small></div></article>
+              <article class="metric-card"><span class="metric-icon lilac">$</span><div><span>Employee sales</span><strong id="employeeSales">$0</strong><small>Sales assigned today</small></div></article>
+            </div>
+            <div class="data-card">
+              <div class="data-card-header">
+                <div><span class="eyebrow">Staff & access</span><h2>Employees</h2></div>
+                <div class="employee-actions">
+                  <button class="secondary-btn" id="syncEmployeesBtn">Sync POS Data</button>
+                  <button class="primary-btn" id="addEmployeeBtn">＋ Add employee</button>
+                </div>
+              </div>
+              <div class="table-wrap">
+                <table><thead><tr><th>Employee</th><th>Role</th><th>Access</th><th>Status</th><th>Today's sales</th><th></th></tr></thead><tbody id="employeeTableBody"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="view" id="settingsView">
+          <div class="mobile-pos-list-screen mobile-settings-screen" id="posSettingsMenu">
+            <button class="mobile-pos-row" type="button" data-pos-settings-page="printers"><span class="mobile-pos-row-icon">▣</span><strong>Printers</strong></button>
+            <button class="mobile-pos-row" type="button" data-pos-settings-page="customerDisplays"><span class="mobile-pos-row-icon">▭</span><strong>Customer displays</strong></button>
+            <button class="mobile-pos-row" type="button" data-pos-settings-page="taxes"><span class="mobile-pos-row-icon">%</span><strong>Taxes</strong></button>
+            <button class="mobile-pos-row" type="button" data-pos-settings-page="general"><span class="mobile-pos-row-icon">⚙</span><strong>General</strong></button>
+            <div class="mobile-settings-footer">
+              <p id="mobileSettingsEmail">fabindiatrinidad@gmail.com</p>
+              <button class="mobile-signout-btn" id="mobileSettingsLogoutBtn" type="button">SIGN OUT</button>
+            </div>
+          </div>
+          <div class="mobile-pos-settings-detail hidden" id="posSettingsDetail">
+            <div class="pos-settings-detail-header">
+              <button class="pos-settings-back" id="posSettingsBackBtn" type="button" aria-label="Back to POS settings">←</button>
+              <h2 id="posSettingsDetailTitle">Settings</h2>
+            </div>
+            <form class="pos-settings-detail-body" id="posSettingsDetailBody"></form>
+          </div>
+          <div class="page-wrap settings-layout">
+            <div class="data-card settings-nav">
+              <button class="settings-tab active">Store profile</button>
+              <button class="settings-tab">Taxes & receipts</button>
+              <button class="settings-tab">Payments</button>
+              <button class="settings-tab">Report email</button>
+              <button class="settings-tab">Printer setup</button>
+              <button class="settings-tab">Loyalty</button>
+            </div>
+            <div class="data-card settings-card">
+              <div class="data-card-header"><div><span class="eyebrow">Configuration</span><h2>Store settings</h2></div></div>
+              <form id="settingsForm" class="form-grid settings-form">
+                <label class="form-field full"><span>Store name</span><input id="settingStoreName" required /></label>
+                <label class="form-field full"><span>Company name</span><input id="settingCompanyName" required /></label>
+                <label class="form-field full"><span>Address</span><input id="settingAddress" /></label>
+                <label class="form-field"><span>Phone</span><input id="settingPhone" /></label>
+                <label class="form-field"><span>Email</span><input id="settingEmail" type="email" /></label>
+                <label class="form-field full"><span>Tax number</span><input id="settingTaxNumber" /></label>
+                <label class="form-field full"><span>Company logo</span><div class="photo-editor"><div class="photo-preview" id="settingLogoPreview"></div><input id="settingLogoInput" type="file" accept="image/*" /><button class="secondary-btn" id="removeLogoBtn" type="button">Remove logo</button></div></label>
+                <label class="form-field full"><span>Receipt header</span><input id="settingReceiptHeader" /></label>
+                <label class="form-field full"><span>Receipt footer</span><input id="settingReceiptFooter" /></label>
+                <label class="form-field full"><span>Thank you message</span><input id="settingThankYou" /></label>
+                <label class="form-field full"><span>Return policy</span><input id="settingReturnPolicy" /></label>
+                <label class="form-field"><span>Currency</span><select id="settingCurrency"><option>TTD - Trinidad & Tobago Dollar</option></select></label>
+                <label class="form-field"><span>Default tax rate (%)</span><input id="settingTax" type="number" min="0" max="100" step="0.1" /></label>
+                <label class="form-field"><span>Tax mode</span><select id="settingTaxInclusive"><option value="false">Exclusive</option><option value="true">Inclusive</option></select></label>
+                <label class="form-field"><span>Loyalty spend per point</span><input id="settingLoyalty" type="number" min="1" step="1" /></label>
+                <label class="form-field"><span>Low stock threshold</span><input id="settingLowStock" type="number" min="0" step="1" /></label>
+                <label class="form-field"><span>POS device</span><input id="settingPosName" /></label>
+                <div class="settings-section full">
+                  <h3>Report email</h3>
+                  <p>Keep detailed sales reporting available for six months and prepare the six-month report email from Back Office.</p>
+                  <div class="form-grid compact">
+                    <label class="form-field"><span>Report email address</span><input id="settingReportEmail" type="email" /></label>
+                    <label class="form-field"><span>Sales detail available</span><select id="settingRetentionMonths"><option value="6">6 months</option><option value="12">12 months</option><option value="3">3 months</option></select></label>
+                    <label class="form-field"><span>Next six-month email date</span><input id="settingNextReportEmail" type="date" /></label>
+                    <label class="form-field full check-field"><input id="settingAutoEmailReports" type="checkbox" /><span>Automatically remind Back Office to email the six-month report</span></label>
+                  </div>
+                  <div class="settings-inline-actions">
+                    <button class="secondary-btn" id="emailSixMonthReportBtn" type="button">Email six-month report now</button>
+                    <small id="reportEmailStatus"></small>
+                  </div>
+                </div>
+                <div class="settings-section full">
+                  <h3>Printer setup</h3>
+                  <p>Set the receipt printer name, paper size, connection type, and cash drawer option.</p>
+                  <div class="form-grid compact">
+                    <label class="form-field"><span>Printer name</span><input id="settingPrinterName" placeholder="Receipt printer" /></label>
+                    <label class="form-field"><span>Printer connection</span><select id="settingPrinterConnection"><option>Browser print</option><option>Bluetooth receipt printer</option><option>Network printer</option><option>USB printer</option></select></label>
+                    <label class="form-field"><span>Printer paper</span><select id="settingPaperSize"><option>58mm</option><option>80mm</option></select></label>
+                    <label class="form-field full check-field"><input id="settingAutoPrint" type="checkbox" /><span>Automatically print after every sale</span></label>
+                    <label class="form-field full check-field"><input id="settingCashDrawer" type="checkbox" /><span>Open cash drawer from POS when supported</span></label>
+                  </div>
+                </div>
+                <button class="primary-btn full submit-btn" type="submit">Save settings</button>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+    <button class="mobile-nav-backdrop" id="mobileNavBackdrop" aria-label="Close menu"></button>
+
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+
+    <dialog class="modal checkout-modal" id="checkoutModal">
+      <div class="modal-head"><div><span class="eyebrow">Complete sale</span><h2>Take payment</h2></div><button class="modal-close" data-close>×</button></div>
+      <div class="payment-total"><span>Amount due</span><strong id="paymentTotal">$0.00</strong></div>
+      <div class="field-label">Payment method</div>
+      <div class="payment-methods">
+        <button class="payment-method active" data-method="Card"><span>▰</span><strong>Card</strong><small>Credit or debit</small></button>
+        <button class="payment-method" data-method="Cash"><span>$</span><strong>Cash</strong><small>Cash tendered</small></button>
+        <button class="payment-method" data-method="Bank Transfer"><span>↗</span><strong>Bank Transfer</strong><small>Transfer payment</small></button>
+        <button class="payment-method" data-method="Other"><span>◈</span><strong>Other</strong><small>Other payment</small></button>
+        <button class="payment-method" data-method="Split"><span>±</span><strong>Split</strong><small>Multiple payments</small></button>
+      </div>
+      <label class="form-field cash-field hidden" id="cashField"><span>Cash tendered</span><input id="cashTendered" inputmode="decimal" placeholder="0.00" /><small id="changeDue">Change due: $0.00</small></label>
+      <div class="split-payment-panel hidden" id="splitPaymentPanel"><div class="split-payment-head"><strong>Split payment</strong><span id="splitRemaining">Remaining: $0.00</span></div><div id="splitPaymentRows"></div><button class="secondary-btn" id="addSplitPaymentBtn" type="button">＋ Add payment</button></div>
+      <button class="checkout-btn" id="completeSaleBtn"><span>Complete sale</span><strong id="completeTotal">$0.00</strong></button>
+    </dialog>
+
+    <dialog class="modal receipt-modal" id="receiptModal">
+      <div class="modal-head no-print"><div><span class="eyebrow">Payment approved</span><h2>Sale complete</h2></div><button class="modal-close" data-close>×</button></div>
+      <div class="success-mark no-print">✓</div>
+      <div class="receipt" id="receiptContent"></div>
+      <div class="receipt-actions no-print"><button class="secondary-btn" data-close>Done</button><button class="primary-btn" id="printReceiptBtn">Print receipt</button></div>
+    </dialog>
+
+    <dialog class="modal form-modal shift-detail-modal" id="shiftDetailModal">
+      <div class="modal-head"><div><span class="eyebrow" id="shiftDetailSubtitle">Daily shift report</span><h2 id="shiftDetailTitle">Shift detail</h2></div><button class="modal-close" data-close>×</button></div>
+      <div class="shift-detail-content" id="shiftDetailContent"></div>
+      <div class="receipt-actions no-print"><button class="secondary-btn" data-close>Done</button><button class="primary-btn" id="printShiftDetailBtn" type="button">Print shift report</button></div>
+    </dialog>
+
+    <dialog class="modal form-modal" id="productModal">
+      <div class="modal-head"><div><span class="eyebrow">Inventory</span><h2 id="productModalTitle">Add product</h2></div><button class="mobile-modal-save pos-app-only" id="mobileProductSaveBtn" type="submit" form="productForm">Save</button><button class="modal-close" data-close>×</button></div>
+      <form id="productForm" class="form-grid">
+        <input type="hidden" id="productId" />
+        <input type="hidden" id="productPhotoData" />
+        <label class="form-field full"><span>Name</span><input id="productName" required placeholder="e.g. Linen Curtain Panel" /></label>
+        <label class="form-field"><span>Category</span><select id="productCategory"><option>Fabric Colours</option><option>Bedsheet</option><option>Curtains</option><option>Blinds</option><option>Rods</option><option>Accessories</option><option>Services</option></select></label>
+        <div class="mobile-sold-by pos-app-only full">
+          <span>Sold by</span>
+          <label><input type="radio" name="mobileSoldBy" checked /> <b>Each</b></label>
+          <label><input type="radio" name="mobileSoldBy" /> <b>Weight</b></label>
+        </div>
+        <label class="form-field"><span>Price</span><input id="productPrice" required type="number" min="0" step="0.01" placeholder="0.00" /></label>
+        <label class="form-field"><span>Average cost</span><input id="productCost" required type="number" min="0" step="0.01" placeholder="0.00" /></label>
+        <label class="form-field"><span>SKU</span><input id="productSku" required placeholder="CUR-001" /></label>
+        <label class="form-field mobile-barcode-field"><span>Barcode</span><input id="productBarcode" placeholder="Scan or type barcode" /><button class="mobile-field-scan pos-app-only" id="productBarcodeScanBtn" type="button" aria-label="Scan item barcode">▥</button></label>
+        <label class="catalog-toggle-row product-catalog-toggle full"><span><strong>Show in Online Catalog</strong><small>Turn off to keep this item inside POS only.</small></span><label class="switch"><input id="productCatalogVisible" type="checkbox" /><span></span></label></label>
+        <div class="mobile-inventory-section pos-app-only full"><h3>Inventory</h3><div class="mobile-track-stock"><span>Track stock</span><label class="mobile-switch"><input type="checkbox" checked /><i></i></label></div></div>
+        <label class="form-field"><span>In stock</span><input id="productStock" required type="number" step="1" placeholder="0" /></label>
+        <label class="form-field"><span>Low stock</span><input id="productReorderLevel" required type="number" min="0" step="1" placeholder="5" /><small>Quantity at which you will be notified about low stock</small></label>
+        <div class="mobile-representation pos-app-only full">
+          <h3>Representation on POS</h3>
+          <div class="mobile-representation-options"><label><input type="radio" name="mobileRepresentation" /> <span>Color and shape</span></label><label><input type="radio" name="mobileRepresentation" checked /> <span>Image</span></label></div>
+        </div>
+        <label class="form-field full product-photo-field"><span>Photo</span><div class="photo-editor"><div class="photo-preview" id="productPhotoPreview"></div><input id="productPhotoInput" type="file" accept="image/*" /><input class="hidden" id="productCameraInput" type="file" accept="image/*" capture="environment" /><button class="secondary-btn" id="removeProductPhotoBtn" type="button">Remove photo</button><button class="mobile-photo-btn pos-app-only" id="chooseProductPhotoBtn" type="button">▰ Choose photo</button><button class="mobile-photo-btn pos-app-only" id="takeProductPhotoBtn" type="button">▣ Take photo</button></div></label>
+        <label class="form-field"><span>Tax (%)</span><input id="productTax" type="number" min="0" max="100" step="0.1" /></label>
+        <label class="form-field full"><span>Color</span><select id="productColor"><option value="sage">Sage</option><option value="clay">Clay</option><option value="sand">Sand</option><option value="lilac">Lilac</option><option value="sky">Sky</option><option value="ink">Ink</option></select></label>
+        <div class="full"><span class="field-label">Stock adjustment history</span><div class="stock-history" id="productStockHistory"></div></div>
+        <button class="mobile-delete-item-btn pos-app-only full hidden" id="deleteProductBtn" type="button">▥ Delete item</button>
+        <button class="primary-btn full submit-btn" type="submit">Save product</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="discountModal">
+      <div class="modal-head"><div><span class="eyebrow">Current order</span><h2>Add discount</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="discountForm" class="form-grid">
+        <label class="form-field full"><span>Discount percent</span><input id="discountPercent" type="number" min="0" max="100" step="1" placeholder="10" /></label>
+        <button class="primary-btn full submit-btn" type="submit">Apply discount</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal mobile-record-modal" id="mobileRecordModal">
+      <div class="modal-head"><div><span class="eyebrow">Items setup</span><h2 id="mobileRecordTitle">Add record</h2></div><button class="mobile-modal-save pos-app-only" id="mobileRecordSaveBtn" type="submit" form="mobileRecordForm">Save</button><button class="modal-close" data-close>×</button></div>
+      <form id="mobileRecordForm" class="form-grid">
+        <input type="hidden" id="mobileRecordType" />
+        <input type="hidden" id="mobileRecordId" />
+        <input type="hidden" id="mobileRecordOldName" />
+        <label class="form-field full"><span>Name</span><input id="mobileRecordName" required placeholder="Name" /></label>
+        <label class="form-field full hidden" id="mobileRecordDiscountTypeField"><span>Discount type</span><select id="mobileRecordDiscountType"><option value="percent">Percent</option><option value="amount">Amount</option></select></label>
+        <label class="form-field full hidden" id="mobileRecordAmountField"><span id="mobileRecordAmountLabel">Amount</span><input id="mobileRecordAmount" type="number" min="0" step="0.01" placeholder="0.00" /></label>
+        <label class="form-field full"><span id="mobileRecordDescriptionLabel">Description</span><input id="mobileRecordDescription" placeholder="Optional" /></label>
+        <label class="form-field full"><span>Status</span><select id="mobileRecordStatus"><option>Active</option><option>Inactive</option></select></label>
+        <button class="mobile-delete-item-btn pos-app-only full hidden" id="deleteMobileRecordBtn" type="button">Delete</button>
+        <button class="primary-btn full submit-btn" type="submit">Save</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="customerModal">
+      <div class="modal-head"><div><span class="eyebrow">Current order</span><h2>Add customer</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="customerForm" class="form-grid">
+        <label class="form-field full"><span>Choose existing customer</span><select id="existingCustomerSelect"><option value="">Create new customer</option></select></label>
+        <label class="form-field full"><span>Customer name</span><input id="customerInput" required placeholder="Full name" /></label>
+        <label class="form-field full"><span>Phone or email</span><input id="customerContact" placeholder="Optional" /></label>
+        <label class="form-field full"><span>Notes</span><input id="customerNotes" placeholder="Measurements, fabric preferences, delivery notes..." /></label>
+        <button class="primary-btn full submit-btn" type="submit">Add to order</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="customItemModal">
+      <div class="modal-head"><div><span class="eyebrow">Current order</span><h2>Custom item</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="customItemForm" class="form-grid">
+        <label class="form-field full"><span>Description</span><input id="customItemName" required placeholder="Made-to-measure service" /></label>
+        <label class="form-field full"><span>Price (TTD)</span><input id="customItemPrice" required type="number" min="0" step="0.01" placeholder="0.00" /></label>
+        <button class="primary-btn full submit-btn" type="submit">Add to cart</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal" id="ticketsModal">
+      <div class="modal-head"><div><span class="eyebrow">Register</span><h2>Open tickets</h2></div><button class="modal-close" data-close>×</button></div>
+      <div class="ticket-list" id="ticketList"></div>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="saveTicketModal">
+      <div class="modal-head"><div><span class="eyebrow">Register</span><h2>Save open ticket</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="saveTicketForm" class="form-grid">
+        <label class="form-field full"><span>Ticket name</span><input id="ticketName" required placeholder="e.g. Smith measurement order" /></label>
+        <button class="primary-btn full submit-btn" type="submit">Save ticket</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="shiftModal">
+      <div class="modal-head"><div><span class="eyebrow">Cash management</span><h2 id="shiftModalTitle">Open shift</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="shiftForm" class="form-grid">
+        <div class="shift-open-details full" id="shiftOpenDetails"></div>
+        <label class="form-field full"><span id="shiftAmountLabel">Opening cash</span><input id="shiftAmount" required type="number" min="0" step="0.01" placeholder="0.00" /></label>
+        <label class="form-field full"><span>Note</span><input id="shiftNote" placeholder="Optional note" /></label>
+        <button class="primary-btn full submit-btn" type="submit" id="shiftSubmitBtn">Open shift</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="stockAdjustmentModal">
+      <div class="modal-head"><div><span class="eyebrow">Inventory</span><h2>Stock adjustment</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="stockAdjustmentForm" class="form-grid">
+        <input type="hidden" id="stockAdjustmentProductId" />
+        <label class="form-field"><span>Type</span><select id="stockAdjustmentType"><option value="add">Add stock</option><option value="remove">Remove stock</option></select></label>
+        <label class="form-field"><span>Quantity</span><input id="stockAdjustmentQuantity" required type="number" min="1" step="1" /></label>
+        <label class="form-field full"><span>Reason</span><input id="stockAdjustmentReason" required placeholder="Purchase, damage, count correction..." /></label>
+        <button class="primary-btn full submit-btn" type="submit">Save adjustment</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="refundApprovalModal">
+      <div class="modal-head"><div><span class="eyebrow">Manager approval</span><h2>Approve refund</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="refundApprovalForm" class="form-grid">
+        <p class="approval-note full">A Manager or Admin must approve this Sales Associate refund.</p>
+        <label class="form-field full"><span>Manager/Admin username</span><input id="approvalUsername" required /></label>
+        <label class="form-field full"><span>Password</span><input id="approvalPassword" required type="password" /></label>
+        <button class="primary-btn full submit-btn" type="submit">Approve and refund</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal scanner-modal" id="barcodeScannerModal">
+      <div class="modal-head"><div><span class="eyebrow">Camera scanner</span><h2>Scan item barcode</h2></div><button class="modal-close" data-close>×</button></div>
+      <div class="scanner-frame">
+        <div id="barcodeReader"></div>
+        <div class="scanner-guide" aria-hidden="true"></div>
+      </div>
+      <p class="scanner-status" id="scannerStatus">Point the camera at an item barcode.</p>
+      <form id="manualBarcodeForm" class="manual-barcode-form">
+        <label class="form-field"><span>Manual barcode or SKU</span><input id="manualBarcodeInput" autocomplete="off" autocapitalize="characters" placeholder="Enter barcode or SKU" /></label>
+        <button class="primary-btn" type="submit">Find item</button>
+      </form>
+      <p class="scanner-help">Camera access works in Web-POS over HTTPS.</p>
+    </dialog>
+
+    <dialog class="modal form-modal" id="workflowModal">
+      <div class="modal-head"><div><span class="eyebrow">Back Office workflow</span><h2 id="workflowModalTitle">Add record</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="workflowForm" class="form-grid">
+        <div class="workflow-form-fields full" id="workflowFormFields"></div>
+        <button class="primary-btn full submit-btn" type="submit">Save record</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="cashMovementModal">
+      <div class="modal-head"><div><span class="eyebrow">Cash drawer</span><h2>Cash movement</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="cashMovementForm" class="form-grid">
+        <label class="form-field"><span>Type</span><select id="cashMovementType"><option value="in">Cash in</option><option value="out">Cash out</option></select></label>
+        <label class="form-field"><span>Amount</span><input id="cashMovementAmount" required type="number" min="0.01" step="0.01" placeholder="0.00" /></label>
+        <label class="form-field full"><span>Reason</span><input id="cashMovementReason" required placeholder="e.g. Petty cash, bank deposit" /></label>
+        <button class="primary-btn full submit-btn" type="submit">Record movement</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal form-modal small-modal" id="employeeModal">
+      <div class="modal-head"><div><span class="eyebrow">Staff & access</span><h2 id="employeeModalTitle">Add employee</h2></div><button class="modal-close" data-close>×</button></div>
+      <form id="employeeForm" class="form-grid">
+        <input type="hidden" id="employeeId" />
+        <label class="form-field full"><span>Employee name</span><input id="employeeName" required placeholder="Full name" /></label>
+        <label class="form-field"><span>4-digit POS PIN</span><input id="employeePin" required type="password" inputmode="numeric" pattern="[0-9]{4}" minlength="4" maxlength="4" placeholder="••••" /></label>
+        <label class="form-field"><span>Email</span><input id="employeeEmail" type="email" placeholder="Optional" /></label>
+        <label class="form-field"><span>Phone</span><input id="employeePhone" type="tel" placeholder="Optional" /></label>
+        <label class="form-field"><span>Role</span><select id="employeeRole"><option>Cashier</option><option>Sales Associate</option><option>Store Manager</option><option>Administrator</option></select></label>
+        <label class="form-field"><span>Access level</span><select id="employeeAccess"><option>Sales POS only</option><option>Sales POS + limited reports</option><option>Full access</option></select></label>
+        <button class="primary-btn full submit-btn" type="submit">Save employee and PIN</button>
+      </form>
+    </dialog>
+
+    <div class="toast" id="toast"></div>
+    <script defer src="/vendor/html5-qrcode.min.js"></script>
+    <script defer src="/app.js?v=21"></script>
+  </body>
+</html>
