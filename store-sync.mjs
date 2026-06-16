@@ -105,7 +105,7 @@ function mergeStoreData(existingData = {}, incomingData = {}, source = "backoffi
 
   if (!merged.employees?.length) merged.employees = defaultEmployees;
   merged.settings = mergeSettings(existingData.settings, incomingData.settings);
-  merged.currentShift = source === "iphone-pos" ? (incomingData.currentShift || null) : (existingData.currentShift ?? incomingData.currentShift ?? null);
+  merged.currentShift = source === "web-pos" ? (incomingData.currentShift || null) : (existingData.currentShift ?? incomingData.currentShift ?? null);
   merged.workflowRecords = applyWorkflowDeletes(mergeWorkflowRecords(existingData.workflowRecords, incomingData.workflowRecords), deletedRecords);
   merged.favoriteProductIds = [...new Set([...(existingData.favoriteProductIds || []), ...(incomingData.favoriteProductIds || [])])];
 

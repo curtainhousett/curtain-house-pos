@@ -58,8 +58,10 @@ document.addEventListener("focusin", keepFocusedFieldVisible);
 document.addEventListener("click", closeFloatingMobileMenus);
 document.addEventListener("visibilitychange", () => {
   if (document.visibilityState === "hidden") saveState();
+  if (document.visibilityState === "visible") syncStoreNow({ silent: true });
 });
 window.addEventListener("online", () => syncStoreNow({ silent: true }));
+window.addEventListener("focus", () => syncStoreNow({ silent: true }));
 
 const defaultProducts = [
   { id: "p1", name: "#1 Aqua Green", sku: "FAB-001", barcode: "100000000001", category: "Fabric Colours", price: 30, cost: 12, stock: 40, reorderLevel: 5, color: "sage" },
@@ -640,6 +642,7 @@ function saveState() {
 }
 
 let storeSyncTimer = null;
+let storeSyncPollTimer = null;
 let applyingStoreSync = false;
 
 function nowIso() {
@@ -813,7 +816,12 @@ function markStoreSyncDirty() {
 
 function scheduleStoreSync() {
   clearTimeout(storeSyncTimer);
-  storeSyncTimer = setTimeout(() => syncStoreNow({ silent: true }), 1400);
+  storeSyncTimer = setTimeout(() => syncStoreNow({ silent: true }), 500);
+}
+
+function syncStoreSoon() {
+  markStoreSyncDirty();
+  if (navigator.onLine) syncStoreNow({ silent: true });
 }
 
 async function pullStoreSync({ silent = false } = {}) {
@@ -874,6 +882,12 @@ async function publishStoreSync({ silent = false, force = false } = {}) {
 
 function syncStoreNow({ silent = false } = {}) {
   return state.sync?.pending ? publishStoreSync({ silent }) : pullStoreSync({ silent });
+}
+
+function startStoreSyncPolling() {
+  clearInterval(storeSyncPollTimer);
+  const interval = isPublicCatalogMode ? 12000 : 15000;
+  storeSyncPollTimer = setInterval(() => syncStoreNow({ silent: true }), interval);
 }
 
 function pullEmployeeSync(options) {
@@ -940,11 +954,15 @@ function loginUser(account, openShiftPrompt = true) {
   $("#loginScreen").classList.add("hidden");
   $("#pinScreen").classList.add("hidden");
   $("#appShell").classList.remove("auth-hidden");
+  resetWebPosSalesChooser();
   applyRoleAccess();
   renderAll();
   if (isBackOfficeWebsite) {
     setView("dashboard");
-    setTimeout(() => publishEmployeeSync({ silent: true }), 300);
+    setTimeout(() => syncStoreNow({ silent: true }).then(() => {
+      renderAll();
+      setView("dashboard");
+    }), 300);
     return;
   }
   if (state.currentShift) {
@@ -954,6 +972,7 @@ function loginUser(account, openShiftPrompt = true) {
     showToast("Open a shift before starting sales");
     if (openShiftPrompt) setTimeout(() => openShiftForm("open"), 150);
   }
+  setTimeout(() => syncStoreNow({ silent: true }).then(renderAll), 300);
 }
 
 function showPasswordLogin(errorMessage = "") {
@@ -1075,6 +1094,32 @@ function mobileCatalogLabel() {
   return "All items";
 }
 
+function ensureValidSalesCatalogFilter() {
+  const categories = categoryNames();
+  if (state.mobileCatalogMode === "category" && !categories.includes(state.mobileCatalogCategory)) {
+    state.mobileCatalogMode = "all";
+    state.mobileCatalogCategory = "";
+    state.activeCategory = "All";
+  }
+  if (state.mobileCatalogMode === "favorites" && !state.favoriteProductIds.length && isWebPosMode) {
+    state.mobileCatalogMode = "all";
+    state.mobileCatalogCategory = "";
+    state.activeCategory = "All";
+  }
+  if (state.activeCategory !== "All" && !categories.includes(state.activeCategory)) {
+    state.activeCategory = "All";
+  }
+}
+
+function resetWebPosSalesChooser() {
+  if (!isWebPosMode) return;
+  state.mobileCatalogMode = "all";
+  state.mobileCatalogCategory = "";
+  state.activeCategory = "All";
+  state.search = "";
+  state.mobileSearchOpen = false;
+}
+
 function updateMobileChrome() {
   if (!isPosAppMode) return;
   const itemCount = state.cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -1167,6 +1212,7 @@ function renderMobileFavoritesEmpty() {
 }
 
 function renderProducts() {
+  ensureValidSalesCatalogFilter();
   const term = state.search.trim().toLowerCase();
   if (isPosRuntime) {
     $("#mobileCatalogLabel").textContent = mobileCatalogLabel();
@@ -2367,7 +2413,7 @@ function savePosSettingsPage(event) {
     state.settings.reportEmail = $("#posReportEmail").value.trim();
   }
   touchRecord(state.settings);
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderSettings();
   showToast(`${posSettingsPageContent(pageKey)?.title || "Settings"} saved`);
 }
@@ -2539,7 +2585,7 @@ function saveCatalogBusinessInfo(event) {
 function updateCatalogSetting(changes, message = "Catalog settings saved") {
   state.settings = normalizeSettings({ ...state.settings, ...changes });
   touchRecord(state.settings);
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderOnlineCatalog();
   renderPublicCatalog();
   if (message) showToast(message);
@@ -2574,6 +2620,7 @@ function renderPublicCatalog() {
     ? `<img src="${state.settings.catalogBanner}" alt="Store banner" />`
     : `<div><span>Online Catalog</span><strong>${escapeHtml(state.settings.storeName || "Curtain House")}</strong><small>${escapeHtml(state.settings.catalogAboutStore || state.settings.thankYouMessage || "Thank you for choosing us.")}</small></div>`;
   const categories = ["All", ...new Set(state.products.filter(catalogProductIsVisible).map((product) => product.category).filter(Boolean))];
+  if (!categories.includes(state.publicCatalogCategory)) state.publicCatalogCategory = "All";
   $("#publicCatalogCategories").innerHTML = categories.map((category) => `<button type="button" class="${state.publicCatalogCategory === category ? "active" : ""}" data-public-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join("");
   const products = state.settings.catalogPublished ? catalogFilteredProducts(state.publicCatalogSearch, state.publicCatalogCategory) : [];
   $("#publicCatalogProducts").className = `public-product-grid ${(state.settings.catalogDisplayMode || "grid")}-mode`;
@@ -2693,10 +2740,9 @@ function submitPublicCatalogOrder(event) {
   state.selectedOnlineOrderId = order.id;
   state.publicCatalogCart = [];
   $("#publicOrderForm").reset();
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderPublicCatalog();
   renderOnlineOrders();
-  syncStoreNow({ silent: true });
   showToast("Order sent to Curtain House");
   if (state.settings.catalogWhatsappOrders) openExternalUrl(catalogWhatsAppUrl(orderMessage(order)));
 }
@@ -2841,7 +2887,7 @@ function setOnlineOrderStatus(id, status) {
   order.status = status;
   order.timeline = [...(order.timeline || []), { status, at: nowIso() }];
   touchRecord(order);
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderOnlineOrders();
   showToast(`Order ${status.toLowerCase()}`);
 }
@@ -2891,7 +2937,7 @@ function finishOnlineOrder(id) {
   order.receiptNumber = transaction.number;
   order.timeline = [...(order.timeline || []), { status: "Completed", at: nowIso() }];
   touchRecord(order);
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderAll();
   showToast(`Order #${order.number} finished`);
 }
@@ -3007,7 +3053,7 @@ function createLinkedWorkflow(targetName, source) {
   if (!state.workflowRecords[targetName]) state.workflowRecords[targetName] = [];
   state.workflowRecords[targetName].unshift(record);
   saveState();
-  markStoreSyncDirty();
+  syncStoreSoon();
   openWorkflow(targetName);
   showToast(`${targetName} record created`);
 }
@@ -3479,7 +3525,7 @@ function importProductsCsv(file) {
     });
     imported.forEach(touchRecord);
     state.products.unshift(...imported);
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast(`${imported.length} items imported`);
   };
@@ -3586,7 +3632,7 @@ function saveMobileRecordForm() {
   }
 
   closeModal($("#mobileRecordModal"));
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderAll();
   showToast(`${label.charAt(0).toUpperCase() + label.slice(1)} ${existingIndex >= 0 ? "updated" : "added"}`);
 }
@@ -3606,7 +3652,7 @@ function deleteMobileRecord() {
   if (type === "discounts") state.discountPresets = state.discountPresets.filter((entry) => entry.id !== id);
   rememberDeleted(type === "discounts" ? "discountPresets" : type, id);
   closeModal($("#mobileRecordModal"));
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderAll();
   showToast(`${mobileRecordLabel(type).charAt(0).toUpperCase() + mobileRecordLabel(type).slice(1)} deleted`);
 }
@@ -3693,7 +3739,7 @@ function completeSale() {
   state.splitPayments = [];
   $("#cashTendered").value = "";
   closeModal($("#checkoutModal"));
-  markStoreSyncDirty();
+  syncStoreSoon();
   createReceipt(transaction);
   openModal($("#receiptModal"));
   renderAll();
@@ -3771,7 +3817,7 @@ function refundTransaction(id) {
   reverseTransactionEffects(transaction);
   touchRecord(transaction);
   saveState();
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderAll();
   showToast(`Receipt #${transaction.number} refunded`);
 }
@@ -3786,7 +3832,7 @@ function cancelTransaction(id) {
   reverseTransactionEffects(transaction);
   touchRecord(transaction);
   saveState();
-  markStoreSyncDirty();
+  syncStoreSoon();
   renderAll();
   showToast(`Receipt #${transaction.number} cancelled`);
 }
@@ -4186,7 +4232,7 @@ function bindEvents() {
     }
     if (event.target.closest("[data-mobile-edit-favorites]")) {
       state.favoriteProductIds = state.products.slice(0, 6).map((product) => product.id);
-      markStoreSyncDirty();
+      syncStoreSoon();
       renderProducts();
       showToast("Favorites added for demo");
       return;
@@ -4250,7 +4296,7 @@ function bindEvents() {
     state.mobileTicketMode = false;
     state.mobileEditingItemId = null;
     closeModal($("#saveTicketModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast("Open ticket saved");
   });
@@ -4274,7 +4320,7 @@ function bindEvents() {
       state.openTickets = state.openTickets.filter((entry) => entry.id !== ticket.id);
       rememberDeleted("openTickets", ticket.id);
       closeModal($("#ticketsModal"));
-      markStoreSyncDirty();
+      syncStoreSoon();
       renderAll();
       showToast("Open ticket loaded");
     }
@@ -4283,7 +4329,7 @@ function bindEvents() {
       state.openTickets = state.openTickets.filter((entry) => entry.id !== deleteButton.dataset.deleteTicket);
       renderTickets();
       saveState();
-      markStoreSyncDirty();
+      syncStoreSoon();
     }
   });
   $("#checkoutBtn").addEventListener("click", openCheckout);
@@ -4349,7 +4395,7 @@ function bindEvents() {
     state.favoriteProductIds = state.favoriteProductIds.filter((id) => id !== product.id);
     rememberDeleted("products", product.id);
     closeModal($("#productModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast("Item deleted");
   });
@@ -4377,7 +4423,7 @@ function bindEvents() {
       state.cart = state.cart.filter((entry) => entry.id !== product.id);
       state.favoriteProductIds = state.favoriteProductIds.filter((id) => id !== product.id);
       rememberDeleted("products", product.id);
-      markStoreSyncDirty();
+      syncStoreSoon();
       renderAll();
       showToast("Product deleted");
     }
@@ -4389,7 +4435,7 @@ function bindEvents() {
     if (!product) return;
     product.catalogVisible = toggle.checked;
     touchRecord(product);
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderOnlineCatalog();
     renderPublicCatalog();
     showToast(toggle.checked ? "Item added to online catalog" : "Item hidden from online catalog");
@@ -4418,7 +4464,7 @@ function bindEvents() {
     if (index >= 0) state.products[index] = product;
     else state.products.unshift(product);
     closeModal($("#productModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast(index >= 0 ? "Product updated" : "Product added");
   });
@@ -4431,7 +4477,7 @@ function bindEvents() {
     product.stockHistory.push({ date: new Intl.DateTimeFormat("en-TT", { dateStyle: "medium", timeStyle: "short" }).format(new Date()), user: currentUser?.name || "—", quantity, reason: $("#stockAdjustmentReason").value.trim() });
     touchRecord(product);
     closeModal($("#stockAdjustmentModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast("Stock adjustment saved");
   });
@@ -4486,7 +4532,7 @@ function bindEvents() {
     if (!existing) state.customers.unshift(customer);
     if (state.customerMode === "order") state.customer = { ...customer };
     closeModal($("#customerModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast(state.customerMode === "order" ? "Customer added to order" : "Customer saved");
   });
@@ -4562,7 +4608,7 @@ function bindEvents() {
     }));
     touchRecord(state.currentShift);
     closeModal($("#cashMovementModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast("Cash movement recorded");
   });
@@ -4615,7 +4661,7 @@ function bindEvents() {
       state.currentShift = null;
     }
     closeModal($("#shiftModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast(mode === "open" ? "Shift opened" : "Shift closed");
     if (mode === "open") setView("sell");
@@ -4646,7 +4692,7 @@ function bindEvents() {
     if (remove && window.confirm(`Delete this ${state.activeModule} record?`)) {
       state.workflowRecords[state.activeModule] = records.filter((entry) => entry.id !== record.id);
       rememberDeleted("workflowRecords", record.id);
-      markStoreSyncDirty();
+      syncStoreSoon();
       renderWorkflow();
       showToast("Workflow record deleted");
     }
@@ -4655,7 +4701,7 @@ function bindEvents() {
       record.status = statuses[Math.min(statuses.length - 1, statuses.indexOf(record.status) + 1)];
       record.updatedAt = new Intl.DateTimeFormat("en-TT", { dateStyle: "medium", timeStyle: "short" }).format(new Date());
       touchRecord(record);
-      markStoreSyncDirty();
+      syncStoreSoon();
       renderWorkflow();
       showToast(`Status changed to ${record.status}`);
     }
@@ -4669,7 +4715,7 @@ function bindEvents() {
       record.status = "Printed";
       record.updatedAt = new Intl.DateTimeFormat("en-TT", { dateStyle: "medium", timeStyle: "short" }).format(new Date());
       touchRecord(record);
-      markStoreSyncDirty();
+      syncStoreSoon();
       renderWorkflow();
     }
   });
@@ -4684,7 +4730,7 @@ function bindEvents() {
     if (existing) Object.assign(existing, next);
     else state.workflowRecords[state.activeModule].unshift(next);
     closeModal($("#workflowModal"));
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderWorkflow();
     showToast(existing ? "Workflow record updated" : "Workflow record added");
   });
@@ -4723,7 +4769,7 @@ function bindEvents() {
     closeModal($("#employeeModal"));
     renderAll();
     showToast(existing ? "Employee PIN updated" : "Employee PIN created");
-    markStoreSyncDirty();
+    syncStoreSoon();
   });
   $("#employeeTableBody").addEventListener("click", (event) => {
     const edit = event.target.closest("[data-edit-employee]");
@@ -4748,7 +4794,7 @@ function bindEvents() {
       if (employee) touchRecord(Object.assign(employee, { status: employee.status === "Clocked in" ? "Clocked out" : "Clocked in" }));
       saveState();
       renderAll();
-      markStoreSyncDirty();
+      syncStoreSoon();
     }
     if (remove) {
       const employee = state.employees.find((entry) => entry.id === remove.dataset.deleteEmployee);
@@ -4758,7 +4804,7 @@ function bindEvents() {
       saveState();
       renderAll();
       showToast("Employee removed");
-      markStoreSyncDirty();
+      syncStoreSoon();
     }
   });
   $("#settingsForm").addEventListener("submit", (event) => {
@@ -4792,7 +4838,7 @@ function bindEvents() {
       cashDrawerEnabled: $("#settingCashDrawer").checked,
     };
     touchRecord(state.settings);
-    markStoreSyncDirty();
+    syncStoreSoon();
     renderAll();
     showToast("Store settings saved");
   });
@@ -4802,14 +4848,14 @@ function bindEvents() {
     touchRecord(state.settings);
     $("#settingLogoPreview").innerHTML = `<img src="${data}" alt="Company logo" />`;
     saveState();
-    markStoreSyncDirty();
+    syncStoreSoon();
   }));
   $("#removeLogoBtn").addEventListener("click", () => {
     state.settings.logo = "";
     touchRecord(state.settings);
     $("#settingLogoPreview").innerHTML = `<span>No logo uploaded</span>`;
     saveState();
-    markStoreSyncDirty();
+    syncStoreSoon();
   });
   $$(".settings-tab").forEach((button) => button.addEventListener("click", () => {
     $$(".settings-tab").forEach((tabButton) => tabButton.classList.toggle("active", tabButton === button));
@@ -4853,6 +4899,7 @@ setDate();
 configureLoginScreen();
 bindEvents();
 renderAll();
+startStoreSyncPolling();
 const savedSession = sessionStorage.getItem("curtain-house-session");
 const savedEmployee = state.employees.find((employee) => employee.id === savedSession || employee.username === savedSession);
 if (isPublicCatalogMode) {
@@ -4864,7 +4911,7 @@ if (isPublicCatalogMode) {
   pullStoreSync({ silent: true }).then(renderPublicCatalog);
 } else if (isPosRuntime && localStorage.getItem(DEVICE_ACTIVATION_KEY)) {
   showPinScreen();
-  pullEmployeeSync({ silent: true });
+  pullEmployeeSync({ silent: true }).then(renderAll);
 } else if (isPosRuntime) {
   showPasswordLogin();
 } else if (savedSession && (savedEmployee || loginAccounts[savedSession])) {
